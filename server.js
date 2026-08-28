@@ -21,7 +21,7 @@ function allocate(db,meal,date){const members=db.members; const tasks=normalized
   const previousDate=db.assignments.filter(a=>a.date<date).sort((a,b)=>b.date.localeCompare(a.date))[0]?.date;
   const previousAssignments=db.assignments.filter(a=>a.date===previousDate);
   const used={}; members.forEach(m=>used[m.id]=new Set());
-  sameDay.forEach(a=>a.items.forEach(i=>used[i.memberId].add(i.taskId)));
+  sameDay.forEach(a=>a.items.forEach(i=>{if(used[i.memberId])used[i.memberId].add(i.taskId)}));
   const slots=tasks.flatMap(t=>Array.from({length:t.slots},()=>t));
   let best=null;
   function variance(load){const vals=members.map(m=>load[m.id]); const mean=vals.reduce((a,b)=>a+b,0)/members.length; return vals.reduce((a,v)=>a+(v-mean)**2,0);}
