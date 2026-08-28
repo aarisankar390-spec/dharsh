@@ -49,7 +49,7 @@
     {
       "id": "cleaning",
       "name": "Cleaning House",
-      "weight": 30,
+      "weight": 15,
       "slots": 1,
       "emoji": "🧹"
     }

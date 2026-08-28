@@ -11,7 +11,7 @@ const defaults={members:[{id:'m1',name:'DHARSHINI'},{id:'m2',name:'SUBETHA'},{id
 {id:'cutting',name:'Vegetable Cutting',weight:15,slots:1,emoji:'🥕'},
 {id:'cooking',name:'Cooking',weight:40,slots:1,emoji:'🍳'},
 {id:'washing',name:'Vessel Washing',weight:15,slots:1,emoji:'🍽️'},
-{id:'cleaning',name:'Cleaning House',weight:30,slots:1,emoji:'🧹'}],assignments:[]};
+{id:'cleaning',name:'Cleaning House',weight:15,slots:1,emoji:'🧹'}],assignments:[]};
 function load(){if(!fs.existsSync(DB)) fs.writeFileSync(DB,JSON.stringify(defaults,null,2)); return JSON.parse(fs.readFileSync(DB));}
 function save(db){fs.writeFileSync(DB,JSON.stringify(db,null,2));}
 function normalizedSlots(db){let sum=db.tasks.reduce((a,t)=>a+t.weight,0);return db.tasks.map(t=>({...t,slotWeight:t.weight/t.slots,normalizedWeight:(t.weight/t.slots)/sum*100}));}
@@ -57,4 +57,5 @@ app.delete('/api/tasks/:id',(req,res)=>{const db=load();if(!db.tasks.some(t=>t.i
 app.post('/api/assign',(req,res)=>{const db=load();const meal=req.body.meal,date=req.body.date||new Date().toISOString().slice(0,10);if(!['breakfast','lunch','dinner'].includes(meal))return res.status(400).json({error:'Invalid meal'});if(db.members.length<4)return res.status(400).json({error:'At least 4 members are required'});db.assignments=db.assignments.filter(a=>!(a.date===date&&a.meal===meal));const items=allocate(db,meal,date);db.assignments.push({id:'a'+Date.now(),date,meal,items,createdAt:new Date().toISOString()});save(db);res.json(db);});
 app.patch('/api/assignment/:id/item/:index',(req,res)=>{const db=load();const a=db.assignments.find(x=>x.id===req.params.id);if(!a)return res.status(404).json({error:'Assignment not found'});const i=a.items[Number(req.params.index)];if(!i)return res.status(404).json({error:'Item not found'});i.status=req.body.status==='completed'?'completed':'pending';i.completedAt=i.status==='completed'?new Date().toISOString():null;save(db);res.json(db);});
 app.delete('/api/reset',(req,res)=>{save(JSON.parse(JSON.stringify(defaults)));res.json(load());});
-app.listen(PORT,()=>console.log(`AI Bachelor Chore Manager running at http://localhost:${PORT}`));
+if(require.main===module)app.listen(PORT,()=>console.log(`AI Bachelor Chore Manager running at http://localhost:${PORT}`));
+module.exports=app;
