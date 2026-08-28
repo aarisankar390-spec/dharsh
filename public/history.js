@@ -1,10 +1,11 @@
 const $ = id => document.getElementById(id);
+const API_BASE = location.hostname.endsWith('netlify.app') ? '/.netlify/functions/api' : '/api';
 const labels = { breakfast: '🍳 Breakfast', lunch: '🍛 Lunch', dinner: '🍽️ Dinner' };
 const today = new Date().toISOString().slice(0, 10);
 $('historyDate').value = today;
 
 async function loadState() {
-  const response = await fetch('/api/state');
+  const response = await fetch(`${API_BASE}/state`);
   if (!response.ok) throw new Error('Unable to load history');
   return response.json();
 }
